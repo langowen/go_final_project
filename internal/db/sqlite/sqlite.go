@@ -31,6 +31,8 @@ func Init(ctx context.Context, path string) (*Storage, error) {
 }
 
 func (s *Storage) new(ctx context.Context) error {
+	defer s.db.Close()
+
 	qUsers := `
     CREATE TABLE IF NOT EXISTS scheduler (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -56,12 +58,5 @@ func (s *Storage) new(ctx context.Context) error {
 		}
 	}
 
-	return nil
-}
-
-func (s *Storage) Close() error {
-	if s.db != nil {
-		return s.db.Close()
-	}
 	return nil
 }
