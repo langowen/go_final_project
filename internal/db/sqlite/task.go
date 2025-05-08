@@ -2,6 +2,7 @@ package sqlite
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 	"github.com/langowen/go_final_project/internal/db"
 	"strconv"
@@ -9,12 +10,10 @@ import (
 )
 
 func (s *Storage) AddTask(task *db.Task) (string, error) {
-	// Проверка обязательных полей
 	if task.Title == "" {
 		return "", fmt.Errorf("title is required")
 	}
 
-	// Валидация даты
 	if task.Date != "" {
 		if _, err := time.Parse("20060102", task.Date); err != nil {
 			return "", fmt.Errorf("invalid date format")
@@ -60,6 +59,68 @@ func (s *Storage) SearchTasks(search string, limit int) ([]*db.Task, error) {
 	}
 
 	return s.searchByText(search, limit)
+}
+
+func (s *Storage) Task(id string) (*db.Task, error) {
+	const query = `
+        SELECT id, date, title, comment, repeat 
+        FROM scheduler 
+        WHERE id = ?
+    `
+
+	var task db.Task
+
+	err := s.db.QueryRow(query, id).Scan(&task.ID, &task.Date, &task.Title, &task.Comment, &task.Repeat)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, db.ErrTaskNotFound
+		}
+
+		return nil, fmt.Errorf("ошибка при выполнении запроса: %w", err)
+	}
+
+	return &task, nil
+}
+
+func (s *Storage) UpdateTask(task *db.Task) error {
+	const query = `
+		UPDATE scheduler 
+		SET date = ?, title = ?, comment = ?, repeat = ?
+		WHERE id = ?
+	`
+	res, err := s.db.Exec(query, task.Date, task.Title, task.Comment, task.Repeat, task.ID)
+	if err != nil {
+		return err
+	}
+
+	count, err := res.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if count == 0 {
+		return fmt.Errorf(`incorrect id for updating task`)
+	}
+	return nil
+}
+
+func (s *Storage) Delete(id string) error {
+	const query = `
+		DELETE FROM scheduler 
+		WHERE id = ?
+	`
+	res, err := s.db.Exec(query, id)
+	if err != nil {
+		return err
+	}
+
+	count, err := res.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if count == 0 {
+		return fmt.Errorf(`incorrect id for deleting task`)
+	}
+	return nil
 }
 
 func (s *Storage) searchByDate(date string, limit int) ([]*db.Task, error) {

@@ -12,11 +12,6 @@ type SuccessResponse struct {
 }
 
 func AddTaskHandler(storage db.Storage, w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		respondWithError(w, http.StatusMethodNotAllowed, "Method not allowed")
-		return
-	}
-
 	var task db.Task
 	if err := json.NewDecoder(r.Body).Decode(&task); err != nil {
 		respondWithError(w, http.StatusBadRequest, "Invalid JSON format")
