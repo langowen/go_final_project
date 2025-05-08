@@ -2,6 +2,7 @@ package api
 
 import (
 	"encoding/json"
+	"github.com/langowen/go_final_project/internal/db"
 	"net/http"
 	"time"
 )
@@ -10,8 +11,21 @@ type ErrorResponse struct {
 	Error string `json:"error"`
 }
 
-func Init(todo *http.ServeMux) {
+func Init(todo *http.ServeMux, storage db.Storage) {
 	todo.HandleFunc("/api/nextdate", nextDateHandler)
+	todo.HandleFunc("/api/task", taskHandler(storage))
+
+}
+
+func taskHandler(storage db.Storage) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+		case http.MethodPost:
+			AddTaskHandler(storage, w, r)
+		default:
+			respondWithError(w, http.StatusMethodNotAllowed, "Method not allowed")
+		}
+	}
 }
 
 func nextDateHandler(w http.ResponseWriter, r *http.Request) {

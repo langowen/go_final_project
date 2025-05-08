@@ -24,9 +24,7 @@ func main() {
 		fmt.Println(err)
 	}
 
-	fmt.Println(sqlite3)
-
-	err = server.NewServer(cfg)
+	err = server.NewServer(cfg, sqlite3)
 	if err != nil {
 		fmt.Printf("не удалось запустить сервер: %s", err)
 	}

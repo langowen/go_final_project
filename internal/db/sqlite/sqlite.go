@@ -17,13 +17,13 @@ func Init(ctx context.Context, path string) (*Storage, error) {
 		return nil, fmt.Errorf("не удалось открыть базу данных: %w", err)
 	}
 
-	if err := db.PingContext(ctx); err != nil {
+	if err = db.PingContext(ctx); err != nil {
 		return nil, fmt.Errorf("не удалось установить соединение с базой данных: %w", err)
 	}
 
 	storage := &Storage{db: db}
 
-	if err := storage.new(ctx); err != nil {
+	if err = storage.new(ctx); err != nil {
 		return nil, fmt.Errorf("не удалось создать таблицы в базе данных: %w", err)
 	}
 
@@ -31,9 +31,7 @@ func Init(ctx context.Context, path string) (*Storage, error) {
 }
 
 func (s *Storage) new(ctx context.Context) error {
-	defer s.db.Close()
-
-	qUsers := `
+	q := `
     CREATE TABLE IF NOT EXISTS scheduler (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         date DATE,
@@ -42,7 +40,7 @@ func (s *Storage) new(ctx context.Context) error {
         repeat VARCHAR
     );`
 
-	_, err := s.db.ExecContext(ctx, qUsers)
+	_, err := s.db.ExecContext(ctx, q)
 	if err != nil {
 		return err
 	}
