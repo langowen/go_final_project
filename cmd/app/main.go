@@ -3,9 +3,9 @@ package main
 import (
 	"context"
 	"fmt"
-	"github.com/langowen/go_final_project/internal/config"
-	"github.com/langowen/go_final_project/internal/db/sqlite"
-	"github.com/langowen/go_final_project/internal/server"
+	"github.com/langowen/go_final_project/pkg/config"
+	"github.com/langowen/go_final_project/pkg/db/sqlite"
+	"github.com/langowen/go_final_project/pkg/server"
 	"time"
 )
 

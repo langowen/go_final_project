@@ -10,6 +10,7 @@ type Config struct {
 	Port   int    `env:"TODO_PORT" env-default:"8088" `
 	WebDir string `env:"TODO_WEB_DIR" env-default:"./web/"`
 	FileDb string `env:"TODO_DBFILE" env-default:"scheduler.db"`
+	Token  string `env:"TODO_PASSWORD"`
 }
 
 func MustLoad(pathEnv string) *Config {

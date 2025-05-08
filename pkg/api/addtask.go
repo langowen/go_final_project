@@ -2,7 +2,7 @@ package api
 
 import (
 	"encoding/json"
-	"github.com/langowen/go_final_project/internal/db"
+	"github.com/langowen/go_final_project/pkg/db"
 	"net/http"
 	"time"
 )
@@ -72,5 +72,8 @@ func checkDate(task *db.Task) error {
 func respondWithSuccess(w http.ResponseWriter, code int, id string) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(code)
-	json.NewEncoder(w).Encode(SuccessResponse{ID: id})
+	err := json.NewEncoder(w).Encode(SuccessResponse{ID: id})
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
 }

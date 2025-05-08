@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-	"github.com/langowen/go_final_project/internal/db"
+	"github.com/langowen/go_final_project/pkg/db"
 	"strconv"
 	"time"
 )

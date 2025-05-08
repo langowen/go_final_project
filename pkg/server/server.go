@@ -2,9 +2,9 @@ package server
 
 import (
 	"fmt"
-	"github.com/langowen/go_final_project/internal/api"
-	"github.com/langowen/go_final_project/internal/config"
-	"github.com/langowen/go_final_project/internal/db"
+	"github.com/langowen/go_final_project/pkg/api"
+	"github.com/langowen/go_final_project/pkg/config"
+	"github.com/langowen/go_final_project/pkg/db"
 	"net/http"
 )
 
@@ -14,7 +14,7 @@ func NewServer(cfg *config.Config, storage db.Storage) error {
 	todo := http.NewServeMux()
 	todo.Handle("/", http.FileServer(http.Dir(cfg.WebDir)))
 
-	api.Init(todo, storage)
+	api.Init(todo, cfg, storage)
 
 	fmt.Printf("Сервер запущен, порт: %d\n", cfg.Port)
 

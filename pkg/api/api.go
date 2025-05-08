@@ -2,7 +2,9 @@ package api
 
 import (
 	"encoding/json"
-	"github.com/langowen/go_final_project/internal/db"
+	"github.com/langowen/go_final_project/pkg/auth"
+	"github.com/langowen/go_final_project/pkg/config"
+	"github.com/langowen/go_final_project/pkg/db"
 	"net/http"
 )
 
@@ -10,16 +12,14 @@ type ErrorResponse struct {
 	Error string `json:"error"`
 }
 
-func Init(todo *http.ServeMux, storage db.Storage) {
-	todo.HandleFunc("/api/nextdate", nextDateHandler)
-	todo.HandleFunc("/api/task", taskHandler(storage))
-	todo.HandleFunc("/api/tasks", func(w http.ResponseWriter, r *http.Request) {
-		tasksHandler(storage, w, r)
+func Init(mux *http.ServeMux, cfg *config.Config, storage db.Storage) {
+	mux.HandleFunc("/api/nextdate", nextDateHandler)
+	mux.HandleFunc("/api/task", auth.Middleware(cfg, taskHandler(storage)))
+	mux.HandleFunc("/api/tasks", auth.Middleware(cfg, tasksHandler(storage)))
+	mux.HandleFunc("/api/task/done", auth.Middleware(cfg, DoneTaskHandler(storage)))
+	mux.HandleFunc("/api/signin", func(w http.ResponseWriter, r *http.Request) {
+		SignInHandler(cfg, w, r)
 	})
-	todo.HandleFunc("/api/task/done", func(w http.ResponseWriter, r *http.Request) {
-		DoneTaskHandler(storage, w, r)
-	})
-
 }
 
 func taskHandler(storage db.Storage) http.HandlerFunc {
@@ -42,7 +42,10 @@ func taskHandler(storage db.Storage) http.HandlerFunc {
 func respondWithError(w http.ResponseWriter, code int, message string) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(code)
-	json.NewEncoder(w).Encode(ErrorResponse{Error: message})
+	err := json.NewEncoder(w).Encode(ErrorResponse{Error: message})
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
 }
 
 func respondWithJSON(w http.ResponseWriter, statusCode int, data interface{}) {
