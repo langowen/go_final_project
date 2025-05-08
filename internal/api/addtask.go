@@ -7,6 +7,10 @@ import (
 	"time"
 )
 
+type SuccessResponse struct {
+	ID string `json:"id"`
+}
+
 func AddTaskHandler(storage db.Storage, w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		respondWithError(w, http.StatusMethodNotAllowed, "Method not allowed")
@@ -41,14 +45,6 @@ func AddTaskHandler(storage db.Storage, w http.ResponseWriter, r *http.Request) 
 
 func checkDate(task *db.Task) error {
 	now := time.Now()
-
-	//formatedDate := now.Format("20060102")
-	//
-	//nowFormated, err := time.Parse("20060102", formatedDate)
-	//if err != nil {
-	//	return err
-	//}
-
 	if task.Date == "" {
 		task.Date = now.Format("20060102")
 	}
@@ -69,10 +65,8 @@ func checkDate(task *db.Task) error {
 
 	if afterNow(now, t) {
 		if len(task.Repeat) == 0 {
-			// если правила повторения нет, то берём сегодняшнее число
 			task.Date = now.Format("20060102")
 		} else {
-			// в противном случае, берём вычисленную ранее следующую дату
 			task.Date = next
 		}
 	}
@@ -80,11 +74,8 @@ func checkDate(task *db.Task) error {
 	return nil
 }
 
-// respondWithSuccess отправляет JSON с ID созданной задачи
 func respondWithSuccess(w http.ResponseWriter, code int, id string) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(code)
-	json.NewEncoder(w).Encode(struct {
-		ID string `json:"id"`
-	}{ID: id})
+	json.NewEncoder(w).Encode(SuccessResponse{ID: id})
 }
