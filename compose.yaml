@@ -1,0 +1,12 @@
+services:
+  todo_app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "${TODO_PORT:-8888}:${TODO_PORT:-8888}"
+    environment:
+      - TODO_PORT=${TODO_PORT:-8888}
+      - TODO_PASSWORD=${TODO_PASSWORD:-225511}
+    volumes:
+      - ./scheduler.db:/app/scheduler.db

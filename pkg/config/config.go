@@ -14,9 +14,7 @@ type Config struct {
 }
 
 func MustLoad(pathEnv string) *Config {
-	if err := godotenv.Load(pathEnv); err != nil {
-		fmt.Println("не удалось загрузить .env файл: " + err.Error())
-	}
+	godotenv.Load(pathEnv)
 
 	var cfg Config
 

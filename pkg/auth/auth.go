@@ -27,7 +27,7 @@ func GenerateToken(cfg *config.Config) (string, error) {
 		return "", ErrNoPassword
 	}
 
-	passwordHash := hashPassword(cfg.Token)
+	passwordHash := HashPassword(cfg.Token)
 
 	claims := Claims{
 		RegisteredClaims: jwt.RegisteredClaims{
@@ -57,14 +57,14 @@ func ValidateToken(cfg *config.Config, tokenString string) (bool, error) {
 	}
 
 	if claims, ok := token.Claims.(*Claims); ok && token.Valid {
-		currentHash := hashPassword(cfg.Token)
+		currentHash := HashPassword(cfg.Token)
 		return claims.PasswordHash == currentHash, nil
 	}
 
 	return false, ErrInvalidToken
 }
 
-func hashPassword(password string) string {
+func HashPassword(password string) string {
 	hash := sha256.Sum256([]byte(password))
 	return hex.EncodeToString(hash[:])
 }
