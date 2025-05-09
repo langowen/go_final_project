@@ -17,10 +17,6 @@ var Search = true
 var Token = ""
 
 func init() {
-	loadConfig()
-}
-
-func init() {
 	cfg := loadConfig()
 	generateTestToken(cfg)
 }
