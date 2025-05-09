@@ -19,29 +19,29 @@ type SignInResponse struct {
 
 func SignInHandler(cfg *config.Config, w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
-		respondWithError(w, http.StatusMethodNotAllowed, "method not allowed")
+		respondWithError(w, http.StatusMethodNotAllowed, "метод не поддерживается")
 		return
 	}
 
 	var req SignInRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		respondWithError(w, http.StatusBadRequest, "invalid request")
+		respondWithError(w, http.StatusBadRequest, "неверный JSON формат")
 		return
 	}
 
 	if cfg.Token == "" {
-		respondWithError(w, http.StatusInternalServerError, "authentication not configured")
+		respondWithError(w, http.StatusInternalServerError, "отсутствует токен")
 		return
 	}
 
 	if req.Password != cfg.Token {
-		respondWithError(w, http.StatusUnauthorized, "Неверный пароль")
+		respondWithError(w, http.StatusUnauthorized, "неверный пароль")
 		return
 	}
 
 	token, err := auth.GenerateToken(cfg)
 	if err != nil {
-		respondWithError(w, http.StatusInternalServerError, "failed to generate token")
+		respondWithError(w, http.StatusInternalServerError, "не удалось сгенерировать токен")
 		return
 	}
 

@@ -11,24 +11,24 @@ import (
 
 func (s *Storage) AddTask(task *db.Task) (string, error) {
 	if task.Title == "" {
-		return "", fmt.Errorf("title is required")
+		return "", fmt.Errorf("отсутствует наименование задачи")
 	}
 
 	if task.Date != "" {
 		if _, err := time.Parse("20060102", task.Date); err != nil {
-			return "", fmt.Errorf("invalid date format")
+			return "", fmt.Errorf("недопустимый формат даты")
 		}
 	}
 
 	query := `INSERT INTO scheduler (date, title, comment, repeat) VALUES (?, ?, ?, ?)`
 	res, err := s.db.Exec(query, task.Date, task.Title, task.Comment, task.Repeat)
 	if err != nil {
-		return "", fmt.Errorf("database error: %v", err)
+		return "", fmt.Errorf("ошибка при выполнении запроса: %w", err)
 	}
 
 	id, err := res.LastInsertId()
 	if err != nil {
-		return "", fmt.Errorf("failed to get last insert ID: %v", err)
+		return "", fmt.Errorf("не удалось получить ID последней добавленной задачи : %w", err)
 	}
 
 	return strconv.FormatInt(id, 10), nil
@@ -46,7 +46,7 @@ func (s *Storage) Tasks(limit int) ([]*db.Task, error) {
 
 	rows, err := s.db.Query(query, today, limit)
 	if err != nil {
-		return nil, fmt.Errorf("query tasks: %w", err)
+		return nil, fmt.Errorf("ошибка при выполнении запроса: %w", err)
 	}
 	defer rows.Close()
 
@@ -98,7 +98,7 @@ func (s *Storage) UpdateTask(task *db.Task) error {
 		return err
 	}
 	if count == 0 {
-		return fmt.Errorf(`incorrect id for updating task`)
+		return fmt.Errorf(`некоретный ID для обновления задачи`)
 	}
 	return nil
 }
@@ -118,7 +118,7 @@ func (s *Storage) Delete(id string) error {
 		return err
 	}
 	if count == 0 {
-		return fmt.Errorf(`incorrect id for deleting task`)
+		return fmt.Errorf(`некоретный ID для удаления задачи`)
 	}
 	return nil
 }
@@ -134,7 +134,7 @@ func (s *Storage) searchByDate(date string, limit int) ([]*db.Task, error) {
 
 	rows, err := s.db.Query(query, date, limit)
 	if err != nil {
-		return nil, fmt.Errorf("query tasks by date: %w", err)
+		return nil, fmt.Errorf("ошибка при выполнении запроса: %w", err)
 	}
 	defer rows.Close()
 
@@ -154,7 +154,7 @@ func (s *Storage) searchByText(search string, limit int) ([]*db.Task, error) {
 	today := time.Now().Format("20060102")
 	rows, err := s.db.Query(query, search, search, today, limit)
 	if err != nil {
-		return nil, fmt.Errorf("query tasks by text: %w", err)
+		return nil, fmt.Errorf("ошибка при выполнении запроса: %w", err)
 	}
 	defer rows.Close()
 
@@ -166,13 +166,13 @@ func scanTasks(rows *sql.Rows) ([]*db.Task, error) {
 	for rows.Next() {
 		var t db.Task
 		if err := rows.Scan(&t.ID, &t.Date, &t.Title, &t.Comment, &t.Repeat); err != nil {
-			return nil, fmt.Errorf("scan task: %w", err)
+			return nil, fmt.Errorf("ошибка при сканировании запроса: %w", err)
 		}
 		tasks = append(tasks, &t)
 	}
 
 	if err := rows.Err(); err != nil {
-		return nil, fmt.Errorf("rows error: %w", err)
+		return nil, fmt.Errorf("ошибка получения строчек из запроса: %w", err)
 	}
 
 	return tasks, nil

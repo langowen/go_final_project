@@ -11,7 +11,7 @@ import (
 
 func nextDateHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		http.Error(w, "метод не поддерживается", http.StatusMethodNotAllowed)
 		return
 	}
 
@@ -20,13 +20,13 @@ func nextDateHandler(w http.ResponseWriter, r *http.Request) {
 	repeat := r.FormValue("repeat")
 
 	if nowStr == "" || date == "" || repeat == "" {
-		respondWithError(w, http.StatusBadRequest, "missing required parameters: now, date or repeat")
+		respondWithError(w, http.StatusBadRequest, "отсутствующие требуемые параметры: текущая дата, дата события или повторение")
 		return
 	}
 
 	now, err := time.Parse("20060102", nowStr)
 	if err != nil {
-		respondWithError(w, http.StatusBadRequest, "invalid now parameter: "+err.Error())
+		respondWithError(w, http.StatusBadRequest, "недопустимый формат текущей даты: "+err.Error())
 		return
 	}
 

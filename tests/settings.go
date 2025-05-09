@@ -42,7 +42,7 @@ func generateTestToken(cfg *config.Config) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	tokenString, err := token.SignedString([]byte(cfg.Token))
 	if err != nil {
-		panic("Failed to generate test token: " + err.Error())
+		panic("не удалось сгенерировать тестовый токен: " + err.Error())
 	}
 
 	Token = tokenString

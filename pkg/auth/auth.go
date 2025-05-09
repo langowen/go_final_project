@@ -13,8 +13,8 @@ import (
 )
 
 var (
-	ErrInvalidToken = errors.New("invalid token")
-	ErrNoPassword   = errors.New("password not set")
+	ErrInvalidToken = errors.New("некорректный токен")
+	ErrNoPassword   = errors.New("пароль не установлен")
 )
 
 type Claims struct {
@@ -47,7 +47,7 @@ func ValidateToken(cfg *config.Config, tokenString string) (bool, error) {
 
 	token, err := jwt.ParseWithClaims(tokenString, &Claims{}, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
+			return nil, fmt.Errorf("неожиданный способ подписания: %v", token.Header["alg"])
 		}
 		return []byte(cfg.Token), nil
 	})
@@ -78,13 +78,13 @@ func Middleware(cfg *config.Config, next http.HandlerFunc) http.HandlerFunc {
 
 		cookie, err := r.Cookie("token")
 		if err != nil {
-			http.Error(w, "Authentication required", http.StatusUnauthorized)
+			http.Error(w, "ошибка проверки подлинности", http.StatusUnauthorized)
 			return
 		}
 
 		valid, err := ValidateToken(cfg, cookie.Value)
 		if err != nil || !valid {
-			http.Error(w, "Authentication required", http.StatusUnauthorized)
+			http.Error(w, "ошибка проверки подлинности", http.StatusUnauthorized)
 			return
 		}
 

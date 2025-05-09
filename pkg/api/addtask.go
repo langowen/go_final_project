@@ -14,12 +14,12 @@ type SuccessResponse struct {
 func AddTaskHandler(storage db.Storage, w http.ResponseWriter, r *http.Request) {
 	var task db.Task
 	if err := json.NewDecoder(r.Body).Decode(&task); err != nil {
-		respondWithError(w, http.StatusBadRequest, "Invalid JSON format")
+		respondWithError(w, http.StatusBadRequest, "неверный JSON формат")
 		return
 	}
 
 	if task.Title == "" {
-		respondWithError(w, http.StatusBadRequest, "Title is required")
+		respondWithError(w, http.StatusBadRequest, "отсутствует заголовок задачи")
 		return
 	}
 
@@ -31,7 +31,7 @@ func AddTaskHandler(storage db.Storage, w http.ResponseWriter, r *http.Request) 
 
 	id, err := storage.AddTask(&task)
 	if err != nil {
-		respondWithError(w, http.StatusInternalServerError, "Failed to add task: "+err.Error())
+		respondWithError(w, http.StatusInternalServerError, "не удалось добавить задачу: "+err.Error())
 		return
 	}
 

@@ -34,7 +34,7 @@ func taskHandler(storage db.Storage) http.HandlerFunc {
 		case http.MethodDelete:
 			DelTaskHandler(storage, w, r)
 		default:
-			respondWithError(w, http.StatusMethodNotAllowed, "Method not allowed")
+			respondWithError(w, http.StatusMethodNotAllowed, "метод не поддерживается")
 		}
 	}
 }

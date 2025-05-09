@@ -14,7 +14,7 @@ type TasksResp struct {
 func tasksHandler(storage db.Storage) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
-			respondWithError(w, http.StatusMethodNotAllowed, "method not allowed")
+			respondWithError(w, http.StatusMethodNotAllowed, "метод не поддерживается")
 			return
 		}
 
