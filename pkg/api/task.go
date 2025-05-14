@@ -15,14 +15,14 @@ type TaskResp struct {
 func GetTaskHandler(storage db.Storage, w http.ResponseWriter, r *http.Request) {
 	id := r.URL.Query().Get("id")
 	if id == "" {
-		respondWithError(w, http.StatusMethodNotAllowed, "не указан идентификатор")
+		respondWithError(w, http.StatusBadRequest, "не указан идентификатор")
 		return
 	}
 
 	task, err := storage.Task(id)
 	if err != nil {
 		if errors.Is(err, db.ErrTaskNotFound) {
-			respondWithError(w, http.StatusMethodNotAllowed, "задача не найдена")
+			respondWithError(w, http.StatusNotFound, "задача не найдена")
 			return
 		}
 		respondWithError(w, http.StatusInternalServerError, err.Error())
@@ -68,14 +68,14 @@ func DoneTaskHandler(storage db.Storage) http.HandlerFunc {
 
 		id := r.URL.Query().Get("id")
 		if id == "" {
-			respondWithError(w, http.StatusMethodNotAllowed, "не указан идентификатор")
+			respondWithError(w, http.StatusBadRequest, "не указан идентификатор")
 			return
 		}
 
 		task, err := storage.Task(id)
 		if err != nil {
 			if errors.Is(err, db.ErrTaskNotFound) {
-				respondWithError(w, http.StatusMethodNotAllowed, "задача не найдена")
+				respondWithError(w, http.StatusNotFound, "задача не найдена")
 				return
 			}
 			respondWithError(w, http.StatusInternalServerError, err.Error())
@@ -113,7 +113,7 @@ func DoneTaskHandler(storage db.Storage) http.HandlerFunc {
 func DelTaskHandler(storage db.Storage, w http.ResponseWriter, r *http.Request) {
 	id := r.URL.Query().Get("id")
 	if id == "" {
-		respondWithError(w, http.StatusMethodNotAllowed, "Не указан идентификатор")
+		respondWithError(w, http.StatusBadRequest, "Не указан идентификатор")
 		return
 	}
 
